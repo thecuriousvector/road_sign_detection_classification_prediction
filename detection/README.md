@@ -14,3 +14,5 @@ Edit the folder path in the "Run_models_on_new_images_Ramya.ipynb" file to inclu
 The slurm script for performing detection is provided in scripts/ folder. Modify according to your needs and run the sbatch.
 
 The total time for prediction was 30.67 hours on 98.6 GB of data. But we parallelized the process by running multiple slurm jobs.
+
+This model outputs raw images with detection box and these are used as inputs for classification and depth prediction models.
