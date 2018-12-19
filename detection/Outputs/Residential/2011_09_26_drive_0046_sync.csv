@@ -1,0 +1,3 @@
+category	folder_path	xmin	xmax	ymin	ymax	class	score	total
+Road	data/0000000077.png	1199	1236	90	129	['prohibitory: 97%']	97.20370769500732	1
+Road	data/0000000074.png	1146	1185	92	132	['prohibitory: 99%']	99.93041753768921	1
