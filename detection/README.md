@@ -13,4 +13,4 @@ Edit the folder path in the "Run_models_on_new_images_Ramya.ipynb" file to inclu
 ## Step 3
 The slurm script for performing detection is provided in scripts/ folder. Modify according to your needs and run the sbatch.
 
-The total time for prediction is 30.67 hours. But we parallelized the process by running multiple slurs jobs.
+The total time for prediction was 30.67 hours on 98.6 GB of data. But we parallelized the process by running multiple slurm jobs.
