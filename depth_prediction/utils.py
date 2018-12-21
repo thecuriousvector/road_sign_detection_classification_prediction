@@ -1,6 +1,6 @@
 from __future__ import division
-import matplotlib.pyplot as plt ##ToDo Remove
-import numpy as np              ##ToDo Remove
+import matplotlib.pyplot as plt
+import numpy as np
 import tensorflow as tf
 
 def compute_errors(gt, pred):

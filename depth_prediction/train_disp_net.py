@@ -32,13 +32,6 @@ class DispNetTrainer(object):
                                                       is_training=True)
             pred_depth = [1. / d for d in pred_disp]
 
-        with tf.name_scope("pose_and_explainability_prediction"):
-            pred_poses, pred_exp_logits, pose_exp_net_endpoints = \
-                pose_exp_net(tgt_image,
-                             src_image_stack,
-                             do_exp=(opt.explain_reg_weight > 0),
-                             is_training=True)
-
         with tf.name_scope("compute_loss"):
             pixel_loss = 0
             exp_loss = 0
@@ -70,7 +63,6 @@ class DispNetTrainer(object):
                     curr_proj_image = projective_inverse_warp(
                         curr_src_image_stack[:, :, :, 3 * i:3 * (i + 1)],
                         tf.squeeze(pred_depth[s], axis=3),
-                        pred_poses[:, i, :],
                         intrinsics[:, s, :, :])
                     curr_proj_error = tf.abs(curr_proj_image - curr_tgt_image)
                     # Cross-entropy loss as regularization for the
@@ -126,7 +118,6 @@ class DispNetTrainer(object):
 
         # Collect tensors that are useful later (e.g. tf summary)
         self.pred_depth = pred_depth
-        self.pred_poses = pred_poses
         self.steps_per_epoch = loader.steps_per_epoch
         self.total_loss = total_loss
         self.pixel_loss = pixel_loss
@@ -194,16 +185,6 @@ class DispNetTrainer(object):
                                  self.deprocess_image(
                                      tf.clip_by_value(self.proj_error_stack_all[s][:, :, :, i * 3:(i + 1) * 3] - 1, -1,
                                                       1)))
-        tf.summary.histogram("tx", self.pred_poses[:, :, 0])
-        tf.summary.histogram("ty", self.pred_poses[:, :, 1])
-        tf.summary.histogram("tz", self.pred_poses[:, :, 2])
-        tf.summary.histogram("rx", self.pred_poses[:, :, 3])
-        tf.summary.histogram("ry", self.pred_poses[:, :, 4])
-        tf.summary.histogram("rz", self.pred_poses[:, :, 5])
-        # for var in tf.trainable_variables():
-        #     tf.summary.histogram(var.op.name + "/values", var)
-        # for grad, var in self.grads_and_vars:
-        #     tf.summary.histogram(var.op.name + "/gradients", grad)
 
     def train(self, opt):
         opt.num_source = opt.seq_length - 1
@@ -278,21 +259,6 @@ class DispNetTrainer(object):
         self.pred_depth = pred_depth
         self.depth_epts = depth_net_endpoints
 
-    def build_pose_test_graph(self):
-        input_uint8 = tf.placeholder(tf.uint8, [self.batch_size,
-                                                self.img_height, self.img_width * self.seq_length, 3],
-                                     name='raw_input')
-        input_mc = self.preprocess_image(input_uint8)
-        loader = DataLoader()
-        tgt_image, src_image_stack = \
-            loader.batch_unpack_image_sequence(
-                input_mc, self.img_height, self.img_width, self.num_source)
-        with tf.name_scope("pose_prediction"):
-            pred_poses, _, _ = pose_exp_net(
-                tgt_image, src_image_stack, do_exp=False, is_training=False)
-            self.inputs = input_uint8
-            self.pred_poses = pred_poses
-
     def preprocess_image(self, image):
         # Assuming input image is uint8
         image = tf.image.convert_image_dtype(image, dtype=tf.float32)
@@ -315,17 +281,11 @@ class DispNetTrainer(object):
         self.batch_size = batch_size
         if self.mode == 'depth':
             self.build_depth_test_graph()
-        if self.mode == 'pose':
-            self.seq_length = seq_length
-            self.num_source = seq_length - 1
-            self.build_pose_test_graph()
 
     def inference(self, inputs, sess, mode='depth'):
         fetches = {}
         if mode == 'depth':
             fetches['depth'] = self.pred_depth
-        if mode == 'pose':
-            fetches['pose'] = self.pred_poses
         results = sess.run(fetches, feed_dict={self.inputs: inputs})
         return results
 
