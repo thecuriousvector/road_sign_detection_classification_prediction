@@ -9,7 +9,7 @@ The depth estimation module in SfMLearner uses the architecture of DispNet. The 
 Please reach out to the authors for pre-processed data
 
 ## Step 2: Training
-python main.py --dataset_dir=<path to preprocessed data> --checkpoint_dir=<path to checkpoints folder> --img_width=416 --img_height=128 --batch_size=4
+Use the slurm-dispnet.sbatch for training the model
   
 ## Step 3: Testing
 python evaluation.py --kitti_dir=<path to raw dataset> --pred_file=<path to .npy file>
