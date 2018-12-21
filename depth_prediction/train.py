@@ -3,7 +3,7 @@ import tensorflow as tf
 import pprint
 import random
 import numpy as np
-from modified_SfMLearner import ModifiedSfMLearner
+from train_disp_net import DispNetTrainer
 import os
 
 flags = tf.app.flags
@@ -40,8 +40,8 @@ def main(_):
     if not os.path.exists(FLAGS.checkpoint_dir):
         os.makedirs(FLAGS.checkpoint_dir)
 
-    sfm = ModifiedSfMLearner()
-    sfm.train(FLAGS)
+    dispNet = DispNetTrainer()
+    dispNet.train(FLAGS)
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import numpy as np
 import os
 # import scipy.misc
 import PIL.Image as pil
-from modified_SfMLearner import ModifiedSfMLearner
+from train_disp_net import DispNetTrainer
 
 flags = tf.app.flags
 flags.DEFINE_integer("batch_size", 4, "The size of of a sample batch")
@@ -16,7 +16,7 @@ flags.DEFINE_string("ckpt_file", None, "checkpoint file")
 FLAGS = flags.FLAGS
 
 def main(_):
-    with open('data/kitti/test_files_eigen.txt', 'r') as f:
+    with open('data/kitti/test.txt', 'r') as f:
         test_files = f.readlines()
         test_files = [FLAGS.dataset_dir + t[:-1] for t in test_files]
     if not os.path.exists(FLAGS.output_dir):
